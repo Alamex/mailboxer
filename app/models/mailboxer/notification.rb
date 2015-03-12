@@ -6,6 +6,12 @@ class Mailboxer::Notification < ActiveRecord::Base
 
   belongs_to :sender, :polymorphic => :true
   belongs_to :notified_object, :polymorphic => :true
+
+  has_one :self_ref, class_name: self, foreign_key: :id
+  has_one :like, through: :self_ref, source: :notified_object, source_type: Like
+  has_one :relationship, through: :self_ref, source: :notified_object, source_type: Relationship
+  has_one :post, through: :self_ref, source: :notified_object, source_type: Post
+
   has_many :receipts, :dependent => :destroy, :class_name => "Mailboxer::Receipt"
 
   validates :subject, :presence => true,
