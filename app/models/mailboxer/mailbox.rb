@@ -17,6 +17,27 @@ class Mailboxer::Mailbox
     notifs
   end
 
+  def notifications_with_messages(options = {})
+    notifs = Mailboxer::Notification
+      .where("(type IS NULL AND mailboxer_notifications.id IN (#{notification_query})) OR (type = :message_type AND mailboxer_notifications.id IN (#{message_query}))",
+        inbox: 'inbox', message_type: 'Mailboxer::Message', receiver_id: messageable.id, receiver_type: messageable.class.base_class.to_s).order("mailboxer_notifications.created_at DESC")
+    if options[:read] == false || options[:unread]
+      notifs = notifs.unread
+    end
+
+    notifs
+  end
+
+  def message_query
+    'SELECT notification_id FROM mailboxer_receipts
+      WHERE mailbox_type = :inbox AND receiver_id = :receiver_id'
+  end
+
+  def notification_query
+    'SELECT notification_id FROM mailboxer_receipts
+      WHERE receiver_id = :receiver_id AND receiver_type = :receiver_type'
+  end
+
   #Returns the conversations for the messageable
   #
   #Options
