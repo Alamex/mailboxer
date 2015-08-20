@@ -11,6 +11,7 @@ class Mailboxer::Notification < ActiveRecord::Base
   has_one :like, through: :self_ref, source: :notified_object, source_type: Like
   has_one :relationship, through: :self_ref, source: :notified_object, source_type: Relationship
   has_one :post, through: :self_ref, source: :notified_object, source_type: Post
+  has_one :user, through: :self_ref, source: :notified_object, source_type: User
 
   has_many :receipts, :dependent => :destroy, :class_name => "Mailboxer::Receipt"
 
